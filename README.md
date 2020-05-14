@@ -24,4 +24,4 @@ TODO
 
 ### Where do we get stop file?
 
-It is one of inputs for adatrap format, it represents valid stop for period of time (operational program duration)
+It is one of inputs for adatrap vis, it represents a set of valid stops for period of time (operational program duration)
