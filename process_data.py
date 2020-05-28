@@ -1,11 +1,14 @@
+# -*- coding: utf8 -*-
 import argparse
 import csv
 import gzip
+import json
 import os
 import sys
 from collections import defaultdict
 from datetime import datetime
 
+from decouple import config
 from pyfiglet import Figlet
 
 from aws import AWSSession
@@ -38,7 +41,7 @@ def main(argv):
     output_filename = args.output_filename
 
     aws_session = AWSSession()
-    # MAPBOX_KEY = config('MAPBOX_KEY')
+    MAPBOX_KEY = config('MAPBOX_KEY')
 
     available_dates = aws_session.get_available_dates()
     dates_in_range = []
@@ -72,7 +75,10 @@ def main(argv):
             file_obj.readline()
             for line in file_obj.readlines():
                 values = line.split(';')
-                stop_code = values[0]
+                stop_code = values[0].encode('latin-1').decode('utf-8')
+
+                if stop_code == "-":
+                    pass
                 stop_name = values[7]
                 area = values[6]
                 date = values[3]
@@ -85,18 +91,26 @@ def main(argv):
     # add location to stop data
     with open(os.path.join(INPUTS_PATH, 'stop.csv'), encoding='latin-1') as csv_file_obj:
         spamreader = csv.reader(csv_file_obj, delimiter=',')
+        next(spamreader)
         for row in spamreader:
             stop_code = row[5]
             stop_longitude = row[7]
             stop_latitude = row[8]
 
-            output[stop_code]['info']['longitude'] = stop_longitude
-            output[stop_code]['info']['latitude'] = stop_latitude
+            output[stop_code]['info']['longitude'] = float(stop_longitude)
+            output[stop_code]['info']['latitude'] = float(stop_latitude)
+
+    # add location to metro station data
+    with open(os.path.join(DATA_PATH, 'metro.geojson')) as metro:
+        data = json.load(metro)
+        for i in data['features']:
+            metro_station = i['properties']['name']
 
     # save csv data
-    with open(output_filename + '.csv', 'w') as outfile:
+    with open(os.path.join(OUTPUTS_PATH, output_filename + '.csv'), 'w', encoding='latin-1') as outfile:
+        data_csv = []
         w = csv.writer(outfile)
-        w.writerow(['fecha', 'nombre', 'area', 'latitud', 'longitud', 'subidas'])
+        w.writerow(['fecha', 'nombre', 'comuna', 'latitud', 'longitud', 'subidas'])
         for data in dict(output):
             info = dict(output)[data]['info']
             longitude = '-'
@@ -123,12 +137,18 @@ def main(argv):
 
             name = data
             for date in dict(output)[data]['dates']:
-                print(date)
                 if valid:
-                    w.writerow([date + " 00:00:00", name, area, longitude, latitude, dict(output)[data]['dates'][date]])
+                    data_row = [date + " 00:00:00", name, area, longitude, latitude, dict(output)[data]['dates'][date]]
+                    w.writerow(data_row)
+                    data_csv.append(data_row)
 
-
-    # TODO: write mapbox_id to kepler file
+    # write mapbox_id to kepler file
+    html_file = open(os.path.join(TEMPLATE_PATH, 'template.html'))
+    html_data = html_file.read()
+    html_file.close()
+    with open(os.path.join(OUTPUTS_PATH, f"{output_filename}.html"), 'w') as output:
+        new_html_data = html_data.replace("<MAPBOX_KEY>", MAPBOX_KEY).replace("<DATA>", str(data_csv))
+        output.write(new_html_data)
 
 
 if __name__ == "__main__":
