@@ -67,6 +67,8 @@ def main(argv):
             available_files.append(file_path)
         else:
             aws_session.download_object_from_bucket(filename, file_path)
+            available_files.append(file_path)
+
 
     output = defaultdict(lambda: dict(info=dict(), dates=defaultdict(lambda: 0)))
     for file_path in available_files:
