@@ -1,4 +1,5 @@
 [![Build Status](https://travis-ci.com/SmartcitySantiagoChile/TransactionByStopVis.svg?branch=master)](https://travis-ci.com/SmartcitySantiagoChile/TransactionByStopVis)
+[![Coverage Status](https://coveralls.io/repos/github/SmartcitySantiagoChile/TransactionByStopVis/badge.svg?branch=master)](https://coveralls.io/github/SmartcitySantiagoChile/TransactionByStopVis?branch=master)
 
 # TransactionByStopVis
 
