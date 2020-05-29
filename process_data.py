@@ -88,6 +88,7 @@ def add_location_to_metro_station_data(inputs_path, output):
         data = json.load(metro)
         for i in data['features']:
             metro_station = i['properties']['name']
+            print(metro_station)
 
 
 def create_csv_data(outputs_path, output_filename, output):
