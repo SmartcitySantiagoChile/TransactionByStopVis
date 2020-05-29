@@ -1,12 +1,12 @@
+import filecmp
 import io
 import os
 from collections import defaultdict
+from contextlib import redirect_stdout
 from datetime import datetime
 from unittest import TestCase
-import filecmp
 
 import mock
-from contextlib import redirect_stdout
 
 import process_data
 
@@ -106,3 +106,32 @@ class ProcessDataTest(TestCase):
             process_data.main(['process_data', '2020-05-08', '2020-05-08', 'output'])
         out = f.getvalue()
         self.assertEqual(out.split("\n")[8], 'output successfully created!')
+
+    @mock.patch('process_data.config')
+    @mock.patch('process_data.write_info_to_kepler_file')
+    @mock.patch('process_data.create_csv_data')
+    @mock.patch('process_data.add_location_to_stop_data')
+    @mock.patch('process_data.get_output_dict')
+    @mock.patch('process_data.get_available_files')
+    @mock.patch('process_data.check_available_days')
+    @mock.patch('process_data.AWSSession')
+    @mock.patch('process_data.OUTPUTS_PATH')
+    @mock.patch('process_data.TEMPLATE_PATH')
+    @mock.patch('process_data.INPUTS_PATH')
+    @mock.patch('process_data.DATA_PATH')
+    @mock.patch('process_data.DIR_PATH')
+    def test_main_without_days(self, dir_path, data_path, input_path, template_path, output_path, aws_session,
+                               check_available_days,
+                               get_available_files, output_dict, add_location_to_stop_data, create_csv_data,
+                               write_info_to_kepler_file, config):
+        dir_path.return_value = self.data_path
+        data_path.return_value = self.data_path
+        input_path.return_value = self.data_path
+        template_path.return_value = self.data_path
+        output_path.return_value = self.data_path
+        check_available_days.return_value = []
+
+        with self.assertRaises(SystemExit) as cm:
+            process_data.main(['process_data', '2020-05-08', '2020-05-08', 'output'])
+
+        self.assertEqual(cm.exception.code, 1)
