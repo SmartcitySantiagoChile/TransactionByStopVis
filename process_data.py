@@ -83,6 +83,13 @@ def add_location_to_stop_data(inputs_path, output):
         return output
 
 
+def add_location_to_metro_station_data(inputs_path, output):
+    with open(os.path.join(DATA_PATH, 'metro.geojson')) as metro:
+        data = json.load(metro)
+        for i in data['features']:
+            metro_station = i['properties']['name']
+
+
 def create_csv_data(outputs_path, output_filename, output):
     with open(os.path.join(outputs_path, output_filename + '.csv'), 'w', encoding='latin-1') as outfile:
         csv_data = []
@@ -170,17 +177,13 @@ def main(argv):
     # add location to stop data
     output = add_location_to_stop_data(INPUTS_PATH, output)
 
-    # add location to metro station data
-    with open(os.path.join(DATA_PATH, 'metro.geojson')) as metro:
-        data = json.load(metro)
-        for i in data['features']:
-            metro_station = i['properties']['name']
-
     # save csv data
     csv_data = create_csv_data(OUTPUTS_PATH, output_filename, output)
 
     # write mapbox_id to kepler file
     write_info_to_kepler_file(TEMPLATE_PATH, OUTPUTS_PATH, output_filename, MAPBOX_KEY, csv_data)
+
+    print('{0} successfully created!'.format(output_filename))
 
 
 if __name__ == "__main__":
