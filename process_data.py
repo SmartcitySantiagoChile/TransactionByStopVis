@@ -32,11 +32,11 @@ def check_available_days(aws_session, start_date, end_date):
     return dates_in_range
 
 
-def get_available_files(dates_in_range, aws_session):
+def get_available_files(dates_in_range, aws_session, data_path):
     available_files = []
     for date in dates_in_range:
         filename = '{0}.transaction.gz'.format(date.strftime('%Y-%m-%d'))
-        file_path = os.path.join(DATA_PATH, filename)
+        file_path = os.path.join(data_path, filename)
         if os.path.exists(file_path):
             print('file {0} exists in local storage ... skip'.format(filename))
             available_files.append(file_path)
@@ -162,7 +162,7 @@ def main(argv):
     print('dates found in period: {0}'.format(len(dates_in_range)))
 
     # get available files
-    available_files = get_available_files(dates_in_range, aws_session)
+    available_files = get_available_files(dates_in_range, aws_session, DATA_PATH)
 
     # create output dict
     output = get_output_dict(available_files)

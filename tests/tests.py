@@ -22,3 +22,8 @@ class ProcessDataTest(TestCase):
         end_date = datetime.strptime('2020-12-31', "%Y-%m-%d")
         available_days = process_data.check_available_days(aws_session, start_date, end_date)
         self.assertEqual(datetime.strptime('2020-02-05', "%Y-%m-%d"), available_days[0])
+
+    @mock.patch('process_data.AWSSession')
+    def test_get_available_files_exist(self, aw_session):
+        dates_in_range = [datetime.strptime('2019-02-05', "%Y-%m-%d")]
+        print(process_data.get_available_files(dates_in_range, aw_session))
