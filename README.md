@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.com/SmartcitySantiagoChile/TransactionByStopVis.svg?branch=master)](https://travis-ci.com/SmartcitySantiagoChile/TransactionByStopVis)
+
 # TransactionByStopVis
 
 To create a visualization with bip! transactions for each stop (bus or metro) per day
