@@ -60,18 +60,40 @@ python -m unittest
 To run TransactionByStopVis you need to execute:
 
 ```
-python process_data.py [DATE_1] [DATE2] [OUTPUT_NAME]
+python process_data.py [start_date] [end_date] [output_name]
 
 ```
+- [OUTPUT_NAME] html file name
+- [start_date] start date in YY-MM-DD format.
+- [end_date]  end date in YY-MM-DD format.
 
 
+
+The output file will be a html file saved at outputs path. 
 ## Help
 
 TODO
 
 ## Tutorial
 
-TODO
+#### Executing the command
+
+First we're going go to execute process_data.py between 2020-05-08 and 2020-05-12
+
+
+```
+python process_data.py 2020-05-08  2020-05-12 tutorial
+```
+If all runs successfully we get the output:
+```
+> tutorial successfully created!
+```
+
+The output can be opened with a web navigator and looks like:
+
+![Tutorial](readme_data/tutorial-1.png)
+
+
 
 ## FAQ
 
