@@ -10,10 +10,21 @@ To create a visualization with bip! transactions for each stop (bus or metro) pe
 - Python 3
 - Dependencies: requirements.txt
 - stops.csv 
+### Install Python 3
+#### Windows users
 
-## Installation
+You need to download  Python 3 from the official web site:
+ 
+ https://www.python.org/downloads/windows/
 
-It's recommended to use a virtual enviroment:
+
+
+
+### Install the project
+
+It's recommended to use a virtual enviroment to keep dependencies required by different projects separate by creating isolated python virtual environments for them.
+
+To create a virtual enviroment:
 
 ```
 virtualenv venv
@@ -33,7 +44,11 @@ pip install -r requirements.txt
 
 
 ### .env file
-You need to define the environment keys in a .env file:
+The env files allow you to put your environment variables inside a file,
+ it is recommended to only have to worry once about the setup and configuration of the application
+ and to not store passwords and sensitive information in the online repository.
+ 
+You need to define the environment keys creating an .env file at root path:
 ```
 AWS_ACCESS_KEY_ID='PUT_HERE_YOUR_ACCESS_KEY'
 AWS_SECRET_ACCESS_KEY='PUT_HERE_YOUR_SECRET_ACCESS_KEY'
@@ -43,13 +58,12 @@ MAPBOX_KEY='PUT_HERE_YOUR_MAPBOX_KEY'
 
 PUT_HERE_YOUR_ACCESS_KEY y PUT_HERE_YOUR_SECRET_ACCESS_KEY can be obtained by an AWS user credentials (https://console.aws.amazon.com/iam/home?#/users).
 
-EARLY_TRANSACTION_BUCKET_NAME ...
+EARLY_TRANSACTION_BUCKET_NAME is the name for aws bucket.
 
-MAPBOX_KEY can be obtained can be obtained by a Mapbox Account (https://docs.mapbox.com/help/how-mapbox-works/access-tokens/)
+MAPBOX_KEY can be obtained by a Mapbox Account (https://docs.mapbox.com/help/how-mapbox-works/access-tokens/)
 
 ## Run tests
-
-You can run the tests using:
+To verify that everything works well on your computer you can run these automatic tests that will tell you if there is a problem:
 
 ```
 python -m unittest
@@ -59,20 +73,25 @@ python -m unittest
 
 To run TransactionByStopVis you need to execute:
 
-```
+
 python process_data.py [start_date] [end_date] [output_name]
 
 ```
-- [OUTPUT_NAME] html file name
+- [output_name] html file name
 - [start_date] start date in YY-MM-DD format.
 - [end_date]  end date in YY-MM-DD format.
+```
 
 
 
 The output file will be a html file saved at outputs path. 
 ## Help
 
-TODO
+To get help with the command you need to execute:
+
+```
+python process_data.py -h 
+```
 
 ## Tutorial
 
@@ -92,6 +111,21 @@ If all runs successfully we get the output:
 The output can be opened with a web navigator and looks like:
 
 ![Tutorial](readme_data/tutorial-1.png)
+
+If you want to show legend info, you should click de upper right icon:
+
+![Tutorial](readme_data/tutorial-2.png)
+
+![Tutorial](readme_data/tutorial-3.png)
+
+If you click the stops it will show info:
+
+![Tutorial](readme_data/tutorial-4.png)
+
+And you can show Metro stops clicking on the left column (eye icon):
+
+![Tutorial](readme_data/tutorial-5.png)
+![Tutorial](readme_data/tutorial-6.png)
 
 
 
