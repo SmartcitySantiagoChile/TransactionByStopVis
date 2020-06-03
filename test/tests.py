@@ -30,18 +30,18 @@ class ProcessDataTest(TestCase):
     @mock.patch('process_data.AWSSession')
     def test_get_available_files_exist(self, aw_session):
         dates_in_range = [datetime.strptime('2020-05-08', "%Y-%m-%d")]
-        correct_path = [os.path.join(self.data_path, '2020-05-08.transaction.gz')]
+        correct_path = [os.path.join(self.data_path, '2020-05-08.4daytransactionbystop.gz')]
         self.assertEqual(correct_path, process_data.get_available_files(dates_in_range, aw_session, self.data_path))
 
     @mock.patch('process_data.AWSSession')
     def test_get_availble_files_doesnt_exist(self, aw_session):
         dates_in_range = [datetime.strptime('2020-06-08', "%Y-%m-%d")]
-        correct_path = [os.path.join(self.data_path, '2020-06-08.transaction.gz')]
+        correct_path = [os.path.join(self.data_path, '2020-06-08.4daytransactionbystop.gz')]
         aw_session.download_object_from_bucket.return_value = correct_path[0]
         self.assertEqual(correct_path, process_data.get_available_files(dates_in_range, aw_session, self.data_path))
 
     def test_get_output_dict(self):
-        available_files = [os.path.join(self.data_path, '2020-05-09.transaction.gz')]
+        available_files = [os.path.join(self.data_path, '2020-05-09.4daytransactionbystop.gz')]
         expected_output = defaultdict(lambda: dict(info=dict(), dates=defaultdict(lambda: 0)))
         expected_output['PC1106']['info']['name'] = 'Parada / Municipalidad de Las Condes'
         expected_output['PC1106']['info']['area'] = 'LAS CONDES'
