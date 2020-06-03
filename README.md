@@ -3,7 +3,7 @@
 
 # TransactionByStopVis
 
-To create a visualization with bip! transactions for each stop (bus or metro) per day
+To create a visualization with bip! transactions for each stop (bus or metro) per day.
 
 ## Requirements
 
@@ -17,10 +17,31 @@ You need to download  Python 3 from the official web site:
  
  https://www.python.org/downloads/windows/
 
+Select the version and download either the <strong> Windows x86-64 executable installer </strong> or <strong> Windows x86 executable installer</strong>.
+
+Run the Python Installer once downloaded. (In this example, we have downloaded Python 3.8.3). 
+
+![Tutorial](readme_data/windows.png)
 
 
+Make sure you select the <strong>Install launcher for all users </strong> and <strong> Add Python 3.8 </strong> to PATH checkboxes. The latter places the interpreter in the execution path.
+
+![Tutorial](readme_data/windows-2.png   )
+
+After setup was succesfull check the <strong>Disable path length limit </strong> option. Choosing this option
+ will allow Python to bypass the 260-character MAX_PATH limit. It is recommended to resolve potential lenght
+  issues that may arise with Python projects developed in Linux (Like this project.) 
+
+![Tutorial](readme_data/windows-3.png   )
 
 ### Install the project
+
+First clone the repository:
+
+```
+git clone https://github.com/SmartcitySantiagoChile/TransactionByStopVis
+```
+
 
 It's recommended to use a virtual enviroment to keep dependencies required by different projects separate by creating isolated python virtual environments for them.
 
@@ -122,10 +143,15 @@ If you click the stops it will show info:
 
 ![Tutorial](readme_data/tutorial-4.png)
 
-And you can show Metro stops clicking on the left column (eye icon):
+You can show Metro stops clicking on the left column (eye icon):
 
 ![Tutorial](readme_data/tutorial-5.png)
 ![Tutorial](readme_data/tutorial-6.png)
+
+You can use the timeline to see the change through time:
+
+![Tutorial](readme_data/tutorial-7.png)
+
 
 
 
