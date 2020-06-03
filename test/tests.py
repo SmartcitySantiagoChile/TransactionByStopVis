@@ -101,11 +101,7 @@ class ProcessDataTest(TestCase):
         template_path.return_value = self.data_path
         output_path.return_value = self.data_path
         check_available_days.return_value = [datetime.strptime('2020-02-05', "%Y-%m-%d")]
-        f = io.StringIO()
-        with redirect_stdout(f):
-            process_data.main(['process_data', '2020-05-08', '2020-05-08', 'output'])
-        out = f.getvalue()
-        self.assertEqual(out.split("\n")[8], 'output successfully created!')
+        process_data.main(['process_data', '2020-05-08', '2020-05-08', 'output'])
 
     @mock.patch('process_data.config')
     @mock.patch('process_data.write_info_to_kepler_file')

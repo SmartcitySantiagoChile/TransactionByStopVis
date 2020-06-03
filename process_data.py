@@ -3,6 +3,7 @@ import argparse
 import csv
 import gzip
 import json
+import logging
 import os
 import sys
 from collections import defaultdict
@@ -12,6 +13,8 @@ from decouple import config
 from pyfiglet import Figlet
 
 from aws import AWSSession
+
+logger = logging.getLogger(__name__)
 
 DIR_PATH = os.path.dirname(os.path.realpath(__file__))
 DATA_PATH = os.path.join(DIR_PATH, 'data')
@@ -38,7 +41,7 @@ def get_available_files(dates_in_range, aws_session, data_path):
         filename = '{0}.4daytransactionbystop.gz'.format(date.strftime('%Y-%m-%d'))
         file_path = os.path.join(data_path, filename)
         if os.path.exists(file_path):
-            print('file {0} exists in local storage ... skip'.format(filename))
+            logger.info('file {0} exists in local storage ... skip'.format(filename))
             available_files.append(file_path)
         else:
             aws_session.download_object_from_bucket(filename, file_path)
@@ -49,7 +52,7 @@ def get_available_files(dates_in_range, aws_session, data_path):
 def get_output_dict(available_files):
     output = defaultdict(lambda: dict(info=dict(), dates=defaultdict(lambda: 0)))
     for file_path in available_files:
-        print('reading file "" ...'.format(os.path.basename(file_path)))
+        logger.info('reading file "" ...'.format(os.path.basename(file_path)))
         with gzip.open(file_path, str('rt'), encoding='latin-1') as file_obj:
             file_obj.readline()
             for line in file_obj.readlines():
@@ -105,19 +108,19 @@ def create_csv_data(outputs_path, output_filename, output):
             if 'longitude' in dict(output)[data]['info']:
                 longitude = info['longitude']
             else:
-                print("Warning: %s doesn't have longitude" % data)
+                logger.warning("Warning: %s doesn't have longitude" % data)
                 valid = False
 
             if 'latitude' in dict(output)[data]['info']:
                 latitude = info['latitude']
             else:
-                print("Warning: %s doesn't have latitude" % data)
+                logger.warning("Warning: %s doesn't have latitude" % data)
                 valid = False
 
             if 'area' in dict(output)[data]['info']:
                 area = info['area']
             else:
-                print("Warning: %s doesn't have area" % data)
+                logger.warning("Warning: %s doesn't have area" % data)
                 valid = False
 
             name = data
@@ -144,7 +147,7 @@ def main(argv):
     This script will create visualization of bip! transaction by stop for each day.
     """
     f = Figlet()
-    print(f.renderText('Welcome DTPM'))
+    logger.info(f.renderText('Welcome DTPM'))
 
     # Arguments and description
     parser = argparse.ArgumentParser(description='create visualization of bip! transaction by stop for each day.')
@@ -165,9 +168,9 @@ def main(argv):
     # check available days
     dates_in_range = check_available_days(aws_session, start_date, end_date)
     if not dates_in_range:
-        print('There is not data between {0} and {1}'.format(start_date, end_date))
+        logger.error('There is not data between {0} and {1}'.format(start_date, end_date))
         exit(1)
-    print('dates found in period: {0}'.format(len(dates_in_range)))
+    logger.info('dates found in period: {0}'.format(len(dates_in_range)))
 
     # get available files
     available_files = get_available_files(dates_in_range, aws_session, DATA_PATH)
@@ -184,7 +187,7 @@ def main(argv):
     # write mapbox_id to kepler file
     write_info_to_kepler_file(TEMPLATE_PATH, OUTPUTS_PATH, output_filename, MAPBOX_KEY, csv_data)
 
-    print('{0} successfully created!'.format(output_filename))
+    logger.info('{0} successfully created!'.format(output_filename))
 
 
 if __name__ == "__main__":
