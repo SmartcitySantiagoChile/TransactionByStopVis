@@ -35,7 +35,7 @@ def check_available_days(aws_session, start_date, end_date):
 def get_available_files(dates_in_range, aws_session, data_path):
     available_files = []
     for date in dates_in_range:
-        filename = '{0}.transaction.gz'.format(date.strftime('%Y-%m-%d'))
+        filename = '{0}.4daytransactionbystop.gz'.format(date.strftime('%Y-%m-%d'))
         file_path = os.path.join(data_path, filename)
         if os.path.exists(file_path):
             print('file {0} exists in local storage ... skip'.format(filename))
