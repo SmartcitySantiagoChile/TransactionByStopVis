@@ -13,13 +13,13 @@ To create a visualization with bip! transactions for each stop (bus or metro) pe
 ### Install Python 3
 #### Windows users
 
-You need to download  Python 3 from the official web site:
+You need to download  Python 3 from official web site:
  
  https://www.python.org/downloads/windows/
 
-Select the version and download either the <strong> Windows x86-64 executable installer </strong> or <strong> Windows x86 executable installer</strong>.
+Select version and download either <strong> Windows x86-64 executable installer </strong> or <strong> Windows x86 executable installer</strong>.
 
-Run the Python Installer once downloaded. (In this example, we have downloaded Python 3.8.3). 
+Run Python Installer once downloaded. (In this example, we have downloaded Python 3.8.3). 
 
 ![Tutorial](readme_data/windows.png)
 
@@ -28,24 +28,24 @@ Make sure you select the <strong>Install launcher for all users </strong> and <s
 
 ![Tutorial](readme_data/windows-2.png   )
 
-After setup was succesfull check the <strong>Disable path length limit </strong> option. Choosing this option
- will allow Python to bypass the 260-character MAX_PATH limit. It is recommended to resolve potential lenght
+After setup was successful check the <strong>Disable path length limit </strong> option. Choosing this option
+ will allow Python to bypass 260-character MAX_PATH limit. It is recommended to resolve potential lenght
   issues that may arise with Python projects developed in Linux (Like this project.) 
 
 ![Tutorial](readme_data/windows-3.png   )
 
-### Install the project
+### Install  project
 
-First clone the repository:
+First clone repository:
 
 ```
 git clone https://github.com/SmartcitySantiagoChile/TransactionByStopVis
 ```
 
 
-It's recommended to use a virtual enviroment to keep dependencies required by different projects separate by creating isolated python virtual environments for them.
+It's recommended to use a virtual environment to keep dependencies required by different projects separate by creating isolated python virtual environments for them.
 
-To create a virtual enviroment:
+To create a virtual environment:
 
 ```
 virtualenv venv
@@ -66,8 +66,8 @@ pip install -r requirements.txt
 
 ### .env file
 The env files allow you to put your environment variables inside a file,
- it is recommended to only have to worry once about the setup and configuration of the application
- and to not store passwords and sensitive information in the online repository.
+ it is recommended to only have to worry once about the setup and configuration of application
+ and to not store passwords and sensitive data in public repository.
  
 You need to define the environment keys creating an .env file at root path:
 ```
@@ -108,7 +108,7 @@ python process_data.py [start_date] [end_date] [output_name]
 The output file will be a html file saved at outputs path. 
 ## Help
 
-To get help with the command you need to execute:
+To get help with command you need to execute:
 
 ```
 python process_data.py -h 
@@ -116,7 +116,7 @@ python process_data.py -h
 
 ## Tutorial
 
-#### Executing the command
+#### Executing command
 
 First we're going go to execute process_data.py between 2020-05-08 and 2020-05-12
 
@@ -139,7 +139,7 @@ If you want to show legend info, you should click de upper right icon:
 
 ![Tutorial](readme_data/tutorial-3.png)
 
-If you click the stops it will show info:
+If you click on stops it will show info:
 
 ![Tutorial](readme_data/tutorial-4.png)
 
@@ -148,7 +148,7 @@ You can show Metro stops clicking on the left column (eye icon):
 ![Tutorial](readme_data/tutorial-5.png)
 ![Tutorial](readme_data/tutorial-6.png)
 
-You can use the timeline to see the change through time:
+You can use timeline widget to see changes through time:
 
 ![Tutorial](readme_data/tutorial-7.png)
 
@@ -159,4 +159,4 @@ You can use the timeline to see the change through time:
 
 ### Where do we get stop file?
 
-It is one of inputs for adatrap vis, it represents a set of valid stops for period of time (operational program duration)
+It is one of inputs for ADATRAP vis, it represents a set of valid stops for period of time (operational program duration)
