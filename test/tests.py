@@ -16,6 +16,8 @@ class ProcessDataTest(TestCase):
     def setUp(self):
         dir_path = os.path.dirname(os.path.realpath(__file__))
         self.data_path = os.path.join(dir_path, 'files')
+        self.test_html_path = os.path.join(self.data_path, 'test.html')
+        self.test_csv_path = os.path.join(self.data_path, 'test.csv')
 
     @mock.patch('process_data.AWSSession')
     def test_check_available_days(self, aws_session):
@@ -135,3 +137,9 @@ class ProcessDataTest(TestCase):
             process_data.main(['process_data', '2020-05-08', '2020-05-08', 'output'])
 
         self.assertEqual(cm.exception.code, 1)
+
+    def tearDown(self):
+        if os.path.exists(self.test_csv_path):
+            os.remove(self.test_csv_path)
+        if os.path.exists(self.test_html_path):
+            os.remove(self.test_html_path)
