@@ -54,13 +54,15 @@ def get_output_dict(available_files):
     for file_path in available_files:
         logger.info('reading file "" ...'.format(os.path.basename(file_path)))
         with gzip.open(file_path, str('rt'), encoding='latin-1') as file_obj:
+            # skip header
             file_obj.readline()
             for line in file_obj.readlines():
                 values = line.split(';')
                 stop_code = values[0].encode('latin-1').decode('utf-8')
 
                 if stop_code == "-":
-                    pass
+                    continue
+
                 stop_name = values[5]
 
                 if stop_name == "-":
@@ -78,7 +80,7 @@ def get_output_dict(available_files):
 
 def add_location_to_stop_data(inputs_path, output):
     with open(os.path.join(inputs_path, 'stop.csv'), encoding='latin-1') as csv_file_obj:
-        spamreader = csv.reader(csv_file_obj, delimiter=',')
+        spamreader = csv.reader(csv_file_obj, delimiter='|')
         next(spamreader)
         for row in spamreader:
             stop_code = row[4]
