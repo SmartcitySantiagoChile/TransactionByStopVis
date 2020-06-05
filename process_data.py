@@ -61,12 +61,16 @@ def get_output_dict(available_files):
 
                 if stop_code == "-":
                     pass
-                stop_name = values[7]
+                stop_name = values[5]
+
+                if stop_name == "-":
+                    stop_name = stop_code
                 area = values[6]
                 date = values[3]
-                transactions = values[8]
+                transactions = values[10]
 
-                output[stop_code]['info']['name'] = stop_name
+                output[stop_code]['info']['stop_name'] = stop_name
+                output[stop_code]['info']['stop_code'] = stop_code
                 output[stop_code]['info']['area'] = area
                 output[stop_code]['dates'][date] += int(transactions)
     return output
@@ -77,7 +81,7 @@ def add_location_to_stop_data(inputs_path, output):
         spamreader = csv.reader(csv_file_obj, delimiter=',')
         next(spamreader)
         for row in spamreader:
-            stop_code = row[5]
+            stop_code = row[4]
             stop_longitude = row[7]
             stop_latitude = row[8]
 
@@ -98,7 +102,7 @@ def create_csv_data(outputs_path, output_filename, output):
     with open(os.path.join(outputs_path, output_filename + '.csv'), 'w', encoding='latin-1') as outfile:
         csv_data = []
         w = csv.writer(outfile)
-        w.writerow(['fecha', 'nombre', 'comuna', 'latitud', 'longitud', 'subidas'])
+        w.writerow(['Fecha', 'Código de usuario', 'Código ts',   'Comuna', 'Latitud', 'Longitud', 'Subidas'])
         for data in dict(output):
             info = dict(output)[data]['info']
             longitude = '-'
@@ -123,10 +127,18 @@ def create_csv_data(outputs_path, output_filename, output):
                 logger.warning("Warning: %s doesn't have area" % data)
                 valid = False
 
-            name = data
+            if 'stop_name' in dict(output)[data]['info']:
+                stop_name = info['stop_name']
+            else:
+                logger.warning("Warning: %s doesn't have area" % data)
+                valid = False
+
+
+
+            stop_code = data
             for date in dict(output)[data]['dates']:
                 if valid:
-                    data_row = [date + " 00:00:00", name, area, longitude, latitude,
+                    data_row = [date + " 00:00:00", stop_name, stop_code, area, longitude, latitude,
                                 dict(output)[data]['dates'][date]]
                     w.writerow(data_row)
                     csv_data.append(data_row)

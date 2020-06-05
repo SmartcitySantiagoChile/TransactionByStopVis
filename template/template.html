@@ -2007,22 +2007,24 @@
       "version": "v1",
       "data": {"id": "yn7iyxfomj", "label": "subidas.csv", "color": [0, 92, 255], "allData": <DATA>,
       "fields": [{
-        "name": "fecha",
+        "name": "Fecha",
         "type": "timestamp",
         "format": "YYYY-M-D H:m:s",
         "analyzerType": "DATETIME"
-      }, {"name": "nombre", "type": "string", "format": "", "analyzerType": "STRING"}, {
-        "name": "comuna",
+      }, {"name": "Código Usuario", "type": "string", "format": "", "analyzerType": "STRING"},
+         {"name": "Código TS", "type": "string", "format": "", "analyzerType": "STRING"},
+        {
+        "name": "Comuna",
         "type": "string",
         "format": "",
         "analyzerType": "STRING"
-      }, {"name": "latitud", "type": "real", "format": "", "analyzerType": "FLOAT"}, {
-        "name": "longitud",
+      }, {"name": "Latitud", "type": "real", "format": "", "analyzerType": "FLOAT"}, {
+        "name": "Longitud",
         "type": "real",
         "format": "",
         "analyzerType": "FLOAT"
-      }, {"name": "subidas", "type": "integer", "format": "", "analyzerType": "INT"}]
-    }
+      }, {"name": "Subidas", "type": "integer", "format": "", "analyzerType": "INT"}]
+    },
   }]
     ;
     const config = {
@@ -2031,7 +2033,7 @@
           "filters": [{
             "dataId": ["yn7iyxfomj"],
             "id": "wto7bo6h",
-            "name": ["fecha"],
+            "name": ["Fecha"],
             "type": "timeRange",
             "value": [1588896000000, 1589026853000],
             "enlarged": true,
@@ -2161,7 +2163,7 @@
               "dataId": "yn7iyxfomj",
               "label": "Subidas",
               "color": [250, 227, 0],
-              "columns": {"lat": "latitud", "lng": "longitud", "altitude": null},
+              "columns": {"lat": "Latitud", "lng": "Longitud", "altitude": null},
               "isVisible": true,
               "visConfig": {
                 "radius": 10,
@@ -2200,16 +2202,16 @@
               "colorScale": "quantile",
               "strokeColorField": null,
               "strokeColorScale": "quantile",
-              "sizeField": {"name": "subidas", "type": "integer"},
+              "sizeField": {"name": "Subidas", "type": "integer"},
               "sizeScale": "sqrt"
             }
           }],
           "interactionConfig": {
             "tooltip": {
               "fieldsToShow": {
-                "uegpx5tde": ["comuna", "provincia"],
+                "uegpx5tde": ["Comuna", "provincia"],
                 "f67razwq": ["line", "name", "color", "marker-color", "marker-size"],
-                "yn7iyxfomj": ["fecha", "nombre", "comuna", "latitud", "longitud", "subidas"]
+                "yn7iyxfomj": ["Fecha", "Código Usuario", "Código TS", "Comuna", "Latitud", "Longitud", "Subidas"]
               }, "enabled": true
             },
             "brush": {"size": 0.5, "enabled": false},

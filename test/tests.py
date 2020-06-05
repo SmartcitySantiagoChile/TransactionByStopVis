@@ -1,8 +1,6 @@
 import filecmp
-import io
 import os
 from collections import defaultdict
-from contextlib import redirect_stdout
 from datetime import datetime
 from unittest import TestCase
 
@@ -45,9 +43,11 @@ class ProcessDataTest(TestCase):
     def test_get_output_dict(self):
         available_files = [os.path.join(self.data_path, '2020-05-09.4daytransactionbystop.gz')]
         expected_output = defaultdict(lambda: dict(info=dict(), dates=defaultdict(lambda: 0)))
-        expected_output['PC1106']['info']['name'] = 'Parada / Municipalidad de Las Condes'
+        expected_output['PC1106']['info']['stop_code'] = 'PC1106'
+        expected_output['PC1106']['info']['stop_name'] = 'T401 00R'
         expected_output['PC1106']['info']['area'] = 'LAS CONDES'
         expected_output['PC1106']['dates']['2020-05-08'] = 3
+        print(process_data.get_output_dict(available_files))
         self.assertDictEqual(expected_output, process_data.get_output_dict(available_files))
 
     def test_add_location_to_stop_data(self):
@@ -69,7 +69,7 @@ class ProcessDataTest(TestCase):
         expected_output['PC1106']['info']['longitude'] = -33.41611369
         expected_output['PC1106']['info']['latitude'] = -70.59369329
         expected_output['ERROR']['info']['name'] = 'Prueba con erroresss'
-        excpected_csv = [['2020-05-08 00:00:00', 'PC1106', 'LAS CONDES', -33.41611369, -70.59369329, 3]]
+        excpected_csv = ['2020-05-08 00:00:00', 'PC1106', 'LAS CONDES', -33.41611369, -70.59369329, 3]
         self.assertEqual(process_data.create_csv_data(self.data_path, output_filename, expected_output),
                          excpected_csv)
 
