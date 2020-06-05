@@ -70,7 +70,6 @@ def get_output_dict(available_files):
                 area = values[6]
                 date = values[3]
                 transactions = values[10]
-                print(stop_code)
                 output[stop_code]['info']['stop_name'] = stop_name
                 output[stop_code]['info']['stop_code'] = stop_code
                 output[stop_code]['info']['area'] = area
