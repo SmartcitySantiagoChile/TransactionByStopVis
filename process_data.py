@@ -52,18 +52,18 @@ def get_available_files(dates_in_range, aws_session, data_path):
 def get_output_dict(available_files):
     output = defaultdict(lambda: dict(info=dict(), dates=defaultdict(lambda: 0)))
     for file_path in available_files:
-        logger.info('reading file "" ...'.format(os.path.basename(file_path)))
+        logger.info('reading file "{0}" ...'.format(os.path.basename(file_path)))
         with gzip.open(file_path, str('rt'), encoding='latin-1') as file_obj:
             # skip header
             file_obj.readline()
             for line in file_obj.readlines():
                 values = line.split(';')
-                stop_code = values[0].encode('latin-1').decode('utf-8')
+                stop_code = values[5].encode('latin-1').decode('utf-8')
 
                 if stop_code == "-":
                     continue
 
-                stop_name = values[5]
+                stop_name = values[7]
                 area = values[6]
                 date = values[3]
                 transactions = values[10]
@@ -80,8 +80,8 @@ def add_location_to_stop_data(inputs_path, output):
         next(spamreader)
         for row in spamreader:
             stop_code = row[5]
-            stop_longitude = row[7]
-            stop_latitude = row[8]
+            stop_latitude = row[7]
+            stop_longitude = row[8]
 
             output[stop_code]['info']['longitude'] = float(stop_longitude)
             output[stop_code]['info']['latitude'] = float(stop_latitude)
@@ -97,7 +97,7 @@ def add_location_to_metro_station_data(inputs_path, output):
 
 
 def create_csv_data(outputs_path, output_filename, output):
-    with open(os.path.join(outputs_path, output_filename + '.csv'), 'w', encoding='latin-1') as outfile:
+    with open(os.path.join(outputs_path, output_filename + '.csv'), 'w', newline='\n', encoding='latin-1') as outfile:
         csv_data = []
         w = csv.writer(outfile)
         w.writerow(['fecha', 'nombre', 'comuna', 'latitud', 'longitud', 'subidas'])
@@ -123,13 +123,11 @@ def create_csv_data(outputs_path, output_filename, output):
                 area = info['area']
             else:
                 logger.warning("Warning: %s doesn't have area" % data)
-                valid = False
 
             name = data
             for date in dict(output)[data]['dates']:
                 if valid:
-                    data_row = [date + " 00:00:00", name, area, longitude, latitude,
-                                dict(output)[data]['dates'][date]]
+                    data_row = [date + " 00:00:00", name, area, longitude, latitude, dict(output)[data]['dates'][date]]
                     w.writerow(data_row)
                     csv_data.append(data_row)
     return csv_data
