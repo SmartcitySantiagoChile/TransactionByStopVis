@@ -93,7 +93,6 @@ def add_location_to_stop_data(inputs_path, output, dates_in_range):
             if not 'stop_name' in dict(output)[stop_code]['info']:
                 output[stop_code]['info']['stop_name'] = row[5]
             if output[stop_code]['dates'] == {}:
-                print(stop_code)
                 for date in dates_in_range:
                     output[stop_code]['dates'][date.strftime('%Y-%m-%d')] = 0
 
