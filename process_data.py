@@ -126,6 +126,7 @@ def create_csv_data(outputs_path, output_filename, output):
 
             name = data
             for date in dict(output)[data]['dates']:
+                print(dict(output)[data]['dates'][date])
                 if valid:
                     data_row = [date + " 00:00:00", name, area, longitude, latitude, dict(output)[data]['dates'][date]]
                     w.writerow(data_row)
@@ -163,7 +164,7 @@ def main(argv):
     output_filename = args.output_filename
 
     aws_session = AWSSession()
-    MAPBOX_KEY = config('MAPBOX_KEY')
+    mapbox_key = config('MAPBOX_KEY')
 
     # check available days
     dates_in_range = check_available_days(aws_session, start_date, end_date)
@@ -185,7 +186,7 @@ def main(argv):
     csv_data = create_csv_data(OUTPUTS_PATH, output_filename, output)
 
     # write mapbox_id to kepler file
-    write_info_to_kepler_file(TEMPLATE_PATH, OUTPUTS_PATH, output_filename, MAPBOX_KEY, csv_data)
+    write_info_to_kepler_file(TEMPLATE_PATH, OUTPUTS_PATH, output_filename, mapbox_key, csv_data)
 
     logger.info('{0} successfully created!'.format(output_filename))
 
