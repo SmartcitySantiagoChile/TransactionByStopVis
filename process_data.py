@@ -52,7 +52,7 @@ def get_available_files(dates_in_range, aws_session, data_path):
 def get_output_dict(available_files):
     output = defaultdict(lambda: dict(info=dict(), dates=defaultdict(lambda: 0)))
     for file_path in available_files:
-        logger.info('reading file "" ...'.format(os.path.basename(file_path)))
+        logger.info('reading file "{0}" ...'.format(os.path.basename(file_path)))
         with gzip.open(file_path, str('rt'), encoding='latin-1') as file_obj:
             # skip header
             file_obj.readline()
@@ -101,7 +101,7 @@ def add_location_to_metro_station_data(inputs_path, output):
 
 
 def create_csv_data(outputs_path, output_filename, output):
-    with open(os.path.join(outputs_path, output_filename + '.csv'), 'w', encoding='latin-1') as outfile:
+    with open(os.path.join(outputs_path, output_filename + '.csv'), 'w', newline='\n', encoding='latin-1') as outfile:
         csv_data = []
         w = csv.writer(outfile)
         w.writerow(['Fecha', 'Código de usuario', 'Código ts',   'Comuna', 'Latitud', 'Longitud', 'Subidas'])
@@ -127,7 +127,6 @@ def create_csv_data(outputs_path, output_filename, output):
                 area = info['area']
             else:
                 logger.warning("Warning: %s doesn't have area" % data)
-                valid = False
 
             if 'stop_name' in dict(output)[data]['info']:
                 stop_name = info['stop_name']
@@ -139,6 +138,7 @@ def create_csv_data(outputs_path, output_filename, output):
 
             stop_code = data
             for date in dict(output)[data]['dates']:
+                print(dict(output)[data]['dates'][date])
                 if valid:
                     data_row = [date + " 00:00:00", stop_name, stop_code, area, longitude, latitude,
                                 dict(output)[data]['dates'][date]]
@@ -177,7 +177,7 @@ def main(argv):
     output_filename = args.output_filename
 
     aws_session = AWSSession()
-    MAPBOX_KEY = config('MAPBOX_KEY')
+    mapbox_key = config('MAPBOX_KEY')
 
     # check available days
     dates_in_range = check_available_days(aws_session, start_date, end_date)
@@ -199,7 +199,7 @@ def main(argv):
     csv_data = create_csv_data(OUTPUTS_PATH, output_filename, output)
 
     # write mapbox_id to kepler file
-    write_info_to_kepler_file(TEMPLATE_PATH, OUTPUTS_PATH, output_filename, MAPBOX_KEY, csv_data)
+    write_info_to_kepler_file(TEMPLATE_PATH, OUTPUTS_PATH, output_filename, mapbox_key, csv_data)
 
     logger.info('{0} successfully created!'.format(output_filename))
 
