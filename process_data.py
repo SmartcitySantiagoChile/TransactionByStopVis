@@ -70,7 +70,7 @@ def get_output_dict(available_files):
                 area = values[6]
                 date = values[3]
                 transactions = values[10]
-
+                print(stop_code)
                 output[stop_code]['info']['stop_name'] = stop_name
                 output[stop_code]['info']['stop_code'] = stop_code
                 output[stop_code]['info']['area'] = area
@@ -97,7 +97,6 @@ def add_location_to_metro_station_data(inputs_path, output):
         data = json.load(metro)
         for i in data['features']:
             metro_station = i['properties']['name']
-            print(metro_station)
 
 
 def create_csv_data(outputs_path, output_filename, output):
@@ -127,6 +126,7 @@ def create_csv_data(outputs_path, output_filename, output):
                 area = info['area']
             else:
                 logger.warning("Warning: %s doesn't have area" % data)
+                valid = False
 
             if 'stop_name' in dict(output)[data]['info']:
                 stop_name = info['stop_name']
@@ -138,7 +138,6 @@ def create_csv_data(outputs_path, output_filename, output):
 
             stop_code = data
             for date in dict(output)[data]['dates']:
-                print(dict(output)[data]['dates'][date])
                 if valid:
                     data_row = [date + " 00:00:00", stop_name, stop_code, area, longitude, latitude,
                                 dict(output)[data]['dates'][date]]
