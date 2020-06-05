@@ -77,7 +77,7 @@ def get_output_dict(available_files):
     return output
 
 
-def add_location_to_stop_data(inputs_path, output):
+def add_location_to_stop_data(inputs_path, output, dates_in_range):
     with open(os.path.join(inputs_path, 'stop.csv'), encoding='latin-1') as csv_file_obj:
         spamreader = csv.reader(csv_file_obj, delimiter='|')
         next(spamreader)
@@ -90,7 +90,12 @@ def add_location_to_stop_data(inputs_path, output):
             output[stop_code]['info']['latitude'] = float(stop_latitude)
             if not 'area' in dict(output)[stop_code]['info']:
                 output[stop_code]['info']['area'] = '-'
-
+            if not 'stop_name' in dict(output)[stop_code]['info']:
+                output[stop_code]['info']['stop_name'] = row[5]
+            if output[stop_code]['dates'] == {}:
+                print(stop_code)
+                for date in dates_in_range:
+                    output[stop_code]['dates'][date.strftime('%Y-%m-%d')] = 0
 
         return output
 
@@ -195,7 +200,7 @@ def main(argv):
     output = get_output_dict(available_files)
 
     # add location to stop data
-    output = add_location_to_stop_data(INPUTS_PATH, output)
+    output = add_location_to_stop_data(INPUTS_PATH, output, dates_in_range)
 
     # save csv data
     csv_data = create_csv_data(OUTPUTS_PATH, output_filename, output)

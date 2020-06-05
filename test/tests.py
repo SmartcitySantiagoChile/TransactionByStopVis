@@ -50,11 +50,12 @@ class ProcessDataTest(TestCase):
         self.assertDictEqual(expected_output, process_data.get_output_dict(available_files), None)
 
     def test_add_location_to_stop_data(self):
+        dates_in_range = [datetime.strptime('2020-05-08', "%Y-%m-%d")]
         expected_output = defaultdict(lambda: dict(info=dict(), dates=defaultdict(lambda: 0)))
         expected_output['T-17-140-OP-80']['info']['stop_code'] = 'T-17-140-OP-80'
         expected_output['T-17-140-OP-80']['info']['area'] = 'LAS CONDES'
         expected_output['T-17-140-OP-80']['dates']['2020-05-08'] = 3
-        output = process_data.add_location_to_stop_data(self.data_path, expected_output)
+        output = process_data.add_location_to_stop_data(self.data_path, expected_output, dates_in_range)
         expected_output['T-17-140-OP-80']['info']['longitude'] = -33.41611369
         expected_output['T-17-140-OP-80']['info']['latitude'] = -70.59369329
         self.assertDictEqual(output, expected_output)
