@@ -1,2 +1,2 @@
-Servicio,ServicioUsuario,Operador,Correlativo,Codigo,CodigoUsuario,Nombre,Latitud,Longitud,esZP
-T401 00R,401R,4,32,T-17-140-OP-80,PC1106,Parada / Municipalidad de Las Condes,-33.41611369,-70.59369329,0
+Servicio|ServicioUsuario|Operador|Correlativo|Codigo|CodigoUsuario|Nombre|Latitud|Longitud|esZP
+T401 00R|401R|4|32|T-17-140-OP-80|PC1106|Parada / Municipalidad de Las Condes|-33.41611369|-70.59369329|0

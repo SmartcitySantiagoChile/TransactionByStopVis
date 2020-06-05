@@ -88,6 +88,10 @@ def add_location_to_stop_data(inputs_path, output):
 
             output[stop_code]['info']['longitude'] = float(stop_longitude)
             output[stop_code]['info']['latitude'] = float(stop_latitude)
+            if not 'area' in dict(output)[stop_code]['info']:
+                output[stop_code]['info']['area'] = '-'
+
+
         return output
 
 
@@ -130,7 +134,7 @@ def create_csv_data(outputs_path, output_filename, output):
             if 'stop_name' in dict(output)[data]['info']:
                 stop_name = info['stop_name']
             else:
-                logger.warning("Warning: %s doesn't have area" % data)
+                logger.warning("Warning: %s doesn't have stop name" % data)
                 valid = False
 
 

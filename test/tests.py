@@ -14,8 +14,8 @@ class ProcessDataTest(TestCase):
     def setUp(self):
         dir_path = os.path.dirname(os.path.realpath(__file__))
         self.data_path = os.path.join(dir_path, 'files')
-        self.test_html_path = os.path.join(self.data_path, 'test.html')
-        self.test_csv_path = os.path.join(self.data_path, 'test.csv')
+        self.test_html_path = os.path.join(self.data_path, '2020-05-09.4daytransactionbystop.html')
+        self.test_csv_path = os.path.join(self.data_path, '2020-05-09.4daytransactionbystop.csv')
 
     @mock.patch('process_data.AWSSession')
     def test_check_available_days(self, aws_session):
@@ -43,42 +43,41 @@ class ProcessDataTest(TestCase):
     def test_get_output_dict(self):
         available_files = [os.path.join(self.data_path, '2020-05-09.4daytransactionbystop.gz')]
         expected_output = defaultdict(lambda: dict(info=dict(), dates=defaultdict(lambda: 0)))
-        expected_output['PC1106']['info']['stop_code'] = 'PC1106'
-        expected_output['PC1106']['info']['stop_name'] = 'T401 00R'
-        expected_output['PC1106']['info']['area'] = 'LAS CONDES'
-        expected_output['PC1106']['dates']['2020-05-08'] = 3
-        print(process_data.get_output_dict(available_files))
-        self.assertDictEqual(expected_output, process_data.get_output_dict(available_files))
+        expected_output['T-17-140-OP-80']['info']['stop_code'] = 'T-17-140-OP-80'
+        expected_output['T-17-140-OP-80']['info']['stop_name'] = 'PC1106'
+        expected_output['T-17-140-OP-80']['info']['area'] = 'LAS CONDES'
+        expected_output['T-17-140-OP-80']['dates']['2020-05-09'] = 3
+        self.assertDictEqual(expected_output, process_data.get_output_dict(available_files), None)
 
     def test_add_location_to_stop_data(self):
         expected_output = defaultdict(lambda: dict(info=dict(), dates=defaultdict(lambda: 0)))
-        expected_output['PC1106']['info']['name'] = 'Parada / Municipalidad de Las Condes'
-        expected_output['PC1106']['info']['area'] = 'LAS CONDES'
-        expected_output['PC1106']['dates']['2020-05-08'] = 3
+        expected_output['T-17-140-OP-80']['info']['stop_code'] = 'T-17-140-OP-80'
+        expected_output['T-17-140-OP-80']['info']['area'] = 'LAS CONDES'
+        expected_output['T-17-140-OP-80']['dates']['2020-05-08'] = 3
         output = process_data.add_location_to_stop_data(self.data_path, expected_output)
-        expected_output['PC1106']['info']['longitude'] = -33.41611369
-        expected_output['PC1106']['info']['latitude'] = -70.59369329
+        expected_output['T-17-140-OP-80']['info']['longitude'] = -33.41611369
+        expected_output['T-17-140-OP-80']['info']['latitude'] = -70.59369329
         self.assertDictEqual(output, expected_output)
 
     def test_create_csv_data(self):
-        output_filename = 'test'
+        output_filename = '2020-05-09.4daytransactionbystop'
         expected_output = defaultdict(lambda: dict(info=dict(), dates=defaultdict(lambda: 0)))
-        expected_output['PC1106']['info']['name'] = 'Parada / Municipalidad de Las Condes'
-        expected_output['PC1106']['info']['area'] = 'LAS CONDES'
-        expected_output['PC1106']['dates']['2020-05-08'] = 3
-        expected_output['PC1106']['info']['longitude'] = -33.41611369
-        expected_output['PC1106']['info']['latitude'] = -70.59369329
-        expected_output['ERROR']['info']['name'] = 'Prueba con erroresss'
-        excpected_csv = ['2020-05-08 00:00:00', 'PC1106', 'LAS CONDES', -33.41611369, -70.59369329, 3]
-        self.assertEqual(process_data.create_csv_data(self.data_path, output_filename, expected_output),
-                         excpected_csv)
+        expected_output['T-17-140-OP-80']['info']['stop_code'] = 'T-17-140-OP-80'
+        expected_output['T-17-140-OP-80']['info']['stop_name'] = 'PC1106'
+        expected_output['T-17-140-OP-80']['info']['area'] = 'LAS CONDES'
+        expected_output['T-17-140-OP-80']['dates']['2020-05-08'] = 3
+        expected_output['T-17-140-OP-80']['info']['longitude'] = -33.41611369
+        expected_output['T-17-140-OP-80']['info']['latitude'] = -70.59369329
+        expected_output['ERROR']['info']['stop'] = 'Prueba con erroresss'
+        excpected_csv = [['2020-05-08 00:00:00', 'PC1106', 'T-17-140-OP-80', 'LAS CONDES', -33.41611369, -70.59369329, 3]]
+        self.assertEqual(excpected_csv, process_data.create_csv_data(self.data_path, output_filename, expected_output))
 
     def test_write_info_to_kepler_file(self):
         csv_data = [['2020-05-08 00:00:00', 'PC1106', 'LAS CONDES', -33.41611369, -70.59369329, 3]]
-        output_filename = 'test'
+        output_filename = '2020-05-09.4daytransactionbystop'
         mapbox_key = "mapbox_key"
         process_data.write_info_to_kepler_file(self.data_path, self.data_path, output_filename, mapbox_key, csv_data)
-        self.assertTrue(filecmp.cmp(os.path.join(self.data_path, 'test.html'),
+        self.assertTrue(filecmp.cmp(os.path.join(self.data_path, '2020-05-09.4daytransactionbystop.html'),
                                     os.path.join(self.data_path, 'test_base.html')))
 
     @mock.patch('process_data.config')
