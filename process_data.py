@@ -14,6 +14,7 @@ from pyfiglet import Figlet
 
 from aws import AWSSession
 
+logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 DIR_PATH = os.path.dirname(os.path.realpath(__file__))
@@ -150,6 +151,7 @@ def add_location_to_metrotren_station_data(inputs_path, output, dates_in_range):
                     output[metro_station]['dates'][date.strftime('%Y-%m-%d')] = 0
     return output
 
+
 def create_csv_data(outputs_path, output_filename, output):
     with open(os.path.join(outputs_path, output_filename + '.csv'), 'w', newline='\n', encoding='latin-1') as outfile:
         csv_data = []
@@ -164,25 +166,25 @@ def create_csv_data(outputs_path, output_filename, output):
             if 'longitude' in dict(output)[data]['info']:
                 longitude = info['longitude']
             else:
-                logger.warning("Warning: %s doesn't have longitude" % data)
+                logger.warning("%s doesn't have longitude" % data)
                 valid = False
 
             if 'latitude' in dict(output)[data]['info']:
                 latitude = info['latitude']
             else:
-                logger.warning("Warning: %s doesn't have latitude" % data)
+                logger.warning("%s doesn't have latitude" % data)
                 valid = False
 
             if 'area' in dict(output)[data]['info']:
                 area = info['area']
             else:
-                logger.warning("Warning: %s doesn't have area" % data)
+                logger.warning("%s doesn't have area" % data)
                 valid = False
 
             if 'stop_name' in dict(output)[data]['info']:
                 stop_name = info['stop_name']
             else:
-                logger.warning("Warning: %s doesn't have stop name" % data)
+                logger.warning("%s doesn't have stop name" % data)
                 valid = False
 
             stop_code = data
