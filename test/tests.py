@@ -47,7 +47,7 @@ class ProcessDataTest(TestCase):
         expected_output['T-17-140-OP-80']['info']['stop_name'] = 'PC1106'
         expected_output['T-17-140-OP-80']['info']['area'] = 'LAS CONDES'
         expected_output['T-17-140-OP-80']['dates']['2020-05-09'] = 3
-        self.assertDictEqual(expected_output, process_data.get_output_dict(available_files), None)
+        self.assertDictEqual(expected_output, process_data.get_output_dict(available_files)[0])
 
     def test_add_location_to_stop_data(self):
         dates_in_range = [datetime.strptime('2020-05-08', "%Y-%m-%d")]
@@ -70,7 +70,8 @@ class ProcessDataTest(TestCase):
         expected_output['T-17-140-OP-80']['info']['longitude'] = -33.41611369
         expected_output['T-17-140-OP-80']['info']['latitude'] = -70.59369329
         expected_output['ERROR']['info']['stop'] = 'Prueba con erroresss'
-        excpected_csv = [['2020-05-08 00:00:00', 'PC1106', 'T-17-140-OP-80', 'LAS CONDES', -33.41611369, -70.59369329, 3]]
+        excpected_csv = [
+            ['2020-05-08 00:00:00', 'PC1106', 'T-17-140-OP-80', 'LAS CONDES', -33.41611369, -70.59369329, 3]]
         self.assertEqual(excpected_csv, process_data.create_csv_data(self.data_path, output_filename, expected_output))
 
     def test_write_info_to_kepler_file(self):
@@ -84,6 +85,8 @@ class ProcessDataTest(TestCase):
     @mock.patch('process_data.config')
     @mock.patch('process_data.write_info_to_kepler_file')
     @mock.patch('process_data.create_csv_data')
+    @mock.patch('process_data.add_location_to_metrotren_station_data')
+    @mock.patch('process_data.add_location_to_metro_station_data')
     @mock.patch('process_data.add_location_to_stop_data')
     @mock.patch('process_data.get_output_dict')
     @mock.patch('process_data.get_available_files')
@@ -95,7 +98,8 @@ class ProcessDataTest(TestCase):
     @mock.patch('process_data.DATA_PATH')
     @mock.patch('process_data.DIR_PATH')
     def test_main(self, dir_path, data_path, input_path, template_path, output_path, aws_session, check_available_days,
-                  get_available_files, output_dict, add_location_to_stop_data, create_csv_data,
+                  get_available_files, output_dict, add_location_to_stop_data, add_location_to_metro_data,
+                  add_location_to_metrotren_station_data, create_csv_data,
                   write_info_to_kepler_file, config):
         dir_path.return_value = self.data_path
         data_path.return_value = self.data_path
@@ -103,6 +107,7 @@ class ProcessDataTest(TestCase):
         template_path.return_value = self.data_path
         output_path.return_value = self.data_path
         check_available_days.return_value = [datetime.strptime('2020-02-05', "%Y-%m-%d")]
+        output_dict.return_value = [mock.MagicMock(), mock.MagicMock(), mock.MagicMock()]
         process_data.main(['process_data', '2020-05-08', '2020-05-08', 'output'])
 
     @mock.patch('process_data.config')

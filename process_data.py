@@ -51,6 +51,8 @@ def get_available_files(dates_in_range, aws_session, data_path):
 
 def get_output_dict(available_files):
     output = defaultdict(lambda: dict(info=dict(), dates=defaultdict(lambda: 0)))
+    metro_stations = set()
+    metrotren_stations = []
     for file_path in available_files:
         logger.info('reading file "{0}" ...'.format(os.path.basename(file_path)))
         with gzip.open(file_path, str('rt'), encoding='latin-1') as file_obj:
@@ -67,6 +69,7 @@ def get_output_dict(available_files):
 
                 if stop_name == "-":
                     stop_name = stop_code
+
                 area = values[6]
                 date = values[3]
                 transactions = values[10]
@@ -74,7 +77,11 @@ def get_output_dict(available_files):
                 output[stop_code]['info']['stop_code'] = stop_code
                 output[stop_code]['info']['area'] = area
                 output[stop_code]['dates'][date] += int(transactions)
-    return output
+
+                if values[8] == 'METRO':
+                    metro_stations.add(stop_name)
+
+    return output, metro_stations, metrotren_stations
 
 
 def add_location_to_stop_data(inputs_path, output, dates_in_range):
@@ -99,18 +106,55 @@ def add_location_to_stop_data(inputs_path, output, dates_in_range):
         return output
 
 
-def add_location_to_metro_station_data(inputs_path, output):
-    with open(os.path.join(DATA_PATH, 'metro.geojson')) as metro:
+def add_location_to_metro_station_data(inputs_path, output, metro_stations, dates_in_range):
+    with open(os.path.join(inputs_path, 'metro.geojson')) as metro:
         data = json.load(metro)
-        for i in data['features']:
-            metro_station = i['properties']['name']
+        for metro in data['features']:
+            metro_station = metro['properties']['name'].split(" ")[1:]
+            metro_station = ' '.join(metro_station[:-1]) if metro_station[-1] == 'L3' or metro_station[-1] == 'L6' \
+                else ' '.join(metro_station)
+            metro_latitude = metro['geometry']['coordinates'][0]
+            metro_longitude = metro['geometry']['coordinates'][1]
+            output[metro_station]['info']['longitude'] = float(metro_longitude)
+            output[metro_station]['info']['latitude'] = float(metro_latitude)
+            if metro_station in metro_stations:
+                metro_stations.discard(metro_station)
+            else:
+                output[metro_station]['info']['stop_name'] = metro_station
+                output[metro_station]['info']['stop_code'] = metro_station
+                output[metro_station]['info']['area'] = '-'
 
+                for date in dates_in_range:
+                    output[metro_station]['dates'][date.strftime('%Y-%m-%d')] = 0
+
+    return output
+
+
+def add_location_to_metrotren_station_data(inputs_path, output, dates_in_range):
+    with open(os.path.join(inputs_path, 'metrotren.geojson')) as metro:
+        data = json.load(metro)
+        for metro in data['features']:
+            metro_station = metro['properties']['name']
+            metro_latitude = metro['geometry']['coordinates'][0]
+            metro_longitude = metro['geometry']['coordinates'][1]
+            output[metro_station]['info']['longitude'] = float(metro_longitude)
+            output[metro_station]['info']['latitude'] = float(metro_latitude)
+            if not 'area' in dict(output)[metro_station]['info']:
+                output[metro_station]['info']['area'] = '-'
+            if not 'stop_name' in dict(output)[metro_station]['info']:
+                output[metro_station]['info']['stop_name'] = metro_station
+            if not 'stop_code' in dict(output)[metro_station]['info']:
+                output[metro_station]['info']['stop_code'] = metro_station
+            if output[metro_station]['dates'] == {}:
+                for date in dates_in_range:
+                    output[metro_station]['dates'][date.strftime('%Y-%m-%d')] = 0
+    return output
 
 def create_csv_data(outputs_path, output_filename, output):
     with open(os.path.join(outputs_path, output_filename + '.csv'), 'w', newline='\n', encoding='latin-1') as outfile:
         csv_data = []
         w = csv.writer(outfile)
-        w.writerow(['Fecha', 'Código de usuario', 'Código ts',   'Comuna', 'Latitud', 'Longitud', 'Subidas'])
+        w.writerow(['Fecha', 'Código de usuario', 'Código ts', 'Comuna', 'Latitud', 'Longitud', 'Subidas'])
         for data in dict(output):
             info = dict(output)[data]['info']
             longitude = '-'
@@ -140,8 +184,6 @@ def create_csv_data(outputs_path, output_filename, output):
             else:
                 logger.warning("Warning: %s doesn't have stop name" % data)
                 valid = False
-
-
 
             stop_code = data
             for date in dict(output)[data]['dates']:
@@ -196,10 +238,16 @@ def main(argv):
     available_files = get_available_files(dates_in_range, aws_session, DATA_PATH)
 
     # create output dict
-    output = get_output_dict(available_files)
+    output, metro_stations, metrotren_stations = get_output_dict(available_files)
 
     # add location to stop data
     output = add_location_to_stop_data(INPUTS_PATH, output, dates_in_range)
+
+    # add location to metro data
+    output = add_location_to_metro_station_data(INPUTS_PATH, output, metro_stations, dates_in_range)
+
+    # add location to metrotren data
+    output = add_location_to_metrotren_station_data(INPUTS_PATH, output, dates_in_range)
 
     # save csv data
     csv_data = create_csv_data(OUTPUTS_PATH, output_filename, output)
