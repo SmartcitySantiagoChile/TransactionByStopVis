@@ -36,12 +36,15 @@ After setup was successful check the <strong>Disable path length limit </strong>
 
 ### Install  project
 
-First clone repository:
+First clone repository at your computer, for instance you can use path `c:\project` in windows or `/home/user/project` for linux environments. If folder does not exist, you have to create it.
+
+Command to get project:
 
 ```
 git clone https://github.com/SmartcitySantiagoChile/TransactionByStopVis
 ```
 
+You can download from github directly too: [https://github.com/](https://github.com/SmartcitySantiagoChile/TransactionByStopVis/releases).
 
 It's recommended to use a virtual environment to keep dependencies required by different projects separate by creating isolated python virtual environments for them.
 

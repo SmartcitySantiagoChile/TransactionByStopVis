@@ -14,6 +14,7 @@ from pyfiglet import Figlet
 
 from aws import AWSSession
 
+logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 DIR_PATH = os.path.dirname(os.path.realpath(__file__))
@@ -156,25 +157,25 @@ def create_csv_data(outputs_path, output_filename, output):
             if 'longitude' in dict(output)[data]['info']:
                 longitude = info['longitude']
             else:
-                logger.warning("Warning: %s doesn't have longitude" % data)
+                logger.warning("%s doesn't have longitude" % data)
                 valid = False
 
             if 'latitude' in dict(output)[data]['info']:
                 latitude = info['latitude']
             else:
-                logger.warning("Warning: %s doesn't have latitude" % data)
+                logger.warning("%s doesn't have latitude" % data)
                 valid = False
 
             if 'area' in dict(output)[data]['info']:
                 area = info['area']
             else:
-                logger.warning("Warning: %s doesn't have area" % data)
+                logger.warning("%s doesn't have area" % data)
                 valid = False
 
             if 'stop_name' in dict(output)[data]['info']:
                 stop_name = info['stop_name']
             else:
-                logger.warning("Warning: %s doesn't have stop name" % data)
+                logger.warning("%s doesn't have stop name" % data)
                 valid = False
 
             if 'stop_code' in dict(output)[data]['info']:
