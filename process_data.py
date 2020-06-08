@@ -83,9 +83,6 @@ def get_output_dict(available_files):
                 output[stop_code]['info']['area'] = area.title()
                 output[stop_code]['dates'][date] += int(transactions)
 
-
-
-
     return output, metro_stations, metrotren_stations
 
 
@@ -123,55 +120,27 @@ def add_location_to_metro_station_data(inputs_path, output, metro_stations, date
             output[station_name + line]['info']['longitude'] = float(metro_station[2])
             output[station_name + line]['info']['latitude'] = float(metro_station[3])
             output[station_name + line]['info']['stop_name'] = "Estación {0}".format(station_name.title())
-            output[station_name + line ]['info']['stop_code'] = "Estación {0} {1}".format(station_name.title(), line)
-            if station_name + line in metro_stations:
-                metro_stations.discard(station_name + line)
-            else:
+            output[station_name + line]['info']['stop_code'] = "Estación {0} {1}".format(station_name.title(), line)
+            if station_name + line not in metro_stations:
                 output[station_name + line]['info']['area'] = metro_station[1].title()
                 for date in dates_in_range:
                     output[station_name + line]['dates'][date.strftime('%Y-%m-%d')] = 0
-
-        # data = json.load(metro)
-        # for metro in data['features']:
-        #     metro_station = metro['properties']['name'].split(" ")[1:]
-        #     metro_station = ' '.join(metro_station[:-1]) if metro_station[-1] == 'L3' or metro_station[-1] == 'L6' \
-        #         else ' '.join(metro_station)
-        #     metro_latitude = metro['geometry']['coordinates'][0]
-        #     metro_longitude = metro['geometry']['coordinates'][1]
-        #     output[metro_station]['info']['longitude'] = float(metro_longitude)
-        #     output[metro_station]['info']['latitude'] = float(metro_latitude)
-        #     if metro_station in metro_stations:
-        #         metro_stations.discard(metro_station)
-        #     else:
-        #         output[metro_station]['info']['stop_name'] = metro_station
-        #         output[metro_station]['info']['stop_code'] = metro_station
-        #         output[metro_station]['info']['area'] = '-'
-        #
-        #         for date in dates_in_range:
-        #             output[metro_station]['dates'][date.strftime('%Y-%m-%d')] = 0
-
     return output
 
 
 def add_location_to_metrotren_station_data(inputs_path, output, dates_in_range):
     with open(os.path.join(inputs_path, 'metrotren.geojson')) as metro:
         data = json.load(metro)
-        for metro in data['features']:
-            metro_station = metro['properties']['name']
-            metro_latitude = metro['geometry']['coordinates'][0]
-            metro_longitude = metro['geometry']['coordinates'][1]
+        for metrotren in data['features']:
+            metro_station = metrotren['properties']['name']
+            metro_latitude = metrotren['geometry']['coordinates'][0]
+            metro_longitude = metrotren['geometry']['coordinates'][1]
             output[metro_station]['info']['longitude'] = float(metro_longitude)
             output[metro_station]['info']['latitude'] = float(metro_latitude)
-            if not 'area' in dict(output)[metro_station]['info']:
-                output[metro_station]['info']['area'] = '-'
             if not 'stop_name' in dict(output)[metro_station]['info']:
                 output[metro_station]['info']['stop_name'] = metro_station
-            if not 'stop_code' in dict(output)[metro_station]['info']:
-                output[metro_station]['info']['stop_code'] = metro_station
-            if output[metro_station]['dates'] == {}:
-                for date in dates_in_range:
-                    output[metro_station]['dates'][date.strftime('%Y-%m-%d')] = 0
     return output
+
 
 def create_csv_data(outputs_path, output_filename, output):
     with open(os.path.join(outputs_path, output_filename + '.csv'), 'w', newline='\n', encoding='latin-1') as outfile:
@@ -206,9 +175,14 @@ def create_csv_data(outputs_path, output_filename, output):
                 stop_name = info['stop_name']
             else:
                 logger.warning("Warning: %s doesn't have stop name" % data)
-
                 valid = False
-            stop_code = info['stop_code']
+
+            if 'stop_code' in dict(output)[data]['info']:
+                stop_code = info['stop_code']
+            else:
+                logger.warning("Warning: %s doesn't have stop name" % data)
+                valid = False
+
             for date in dict(output)[data]['dates']:
                 if valid:
                     data_row = [date + " 00:00:00", stop_name, stop_code, area, longitude, latitude,
