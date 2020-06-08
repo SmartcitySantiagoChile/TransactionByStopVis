@@ -83,7 +83,6 @@ class ProcessDataTest(TestCase):
                                                                      dates_in_range)
         expected_output['Estacion Nos']['info']['longitude'] = -33.477086
         expected_output['Estacion Nos']['info']['latitude'] = -70.680622
-        print(output)
         self.assertDictEqual(output, expected_output)
 
     def test_create_csv_data(self):
