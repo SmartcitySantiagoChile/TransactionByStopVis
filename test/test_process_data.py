@@ -162,7 +162,7 @@ class ProcessDataTest(TestCase):
         with self.assertRaises(SystemExit) as cm:
             process_data.main(['process_data', '2020-05-08', '2020-05-08', 'output'])
 
-        self.assertEqual(cm.exception.code, 1)
+            self.assertEqual(cm.exception.code, 1)
 
     def tearDown(self):
         if os.path.exists(self.test_csv_path):
