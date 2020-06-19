@@ -61,12 +61,12 @@ def get_output_dict(available_files):
             file_obj.readline()
             for line in file_obj.readlines():
                 values = line.split(';')
-                stop_code = values[3].encode('latin-1').decode('utf-8')
+                stop_code = values[2].encode('latin-1').decode('utf-8')
 
                 if stop_code == "-":
                     continue
 
-                stop_name = values[5]
+                stop_name = values[3]
 
                 if stop_name == "-":
                     stop_name = stop_code
