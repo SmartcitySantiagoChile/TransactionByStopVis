@@ -61,7 +61,7 @@ def get_output_dict(available_files):
             file_obj.readline()
             for line in file_obj.readlines():
                 values = line.split(';')
-                stop_code = values[0].encode('latin-1').decode('utf-8')
+                stop_code = values[3].encode('latin-1').decode('utf-8')
 
                 if stop_code == "-":
                     continue
@@ -71,12 +71,12 @@ def get_output_dict(available_files):
                 if stop_name == "-":
                     stop_name = stop_code
 
-                area = values[6]
-                date = values[3]
+                area = values[4]
+                date = values[0]
                 transactions = values[10]
 
-                if values[8] == 'METRO':
-                    stop_code = stop_code + values[9]
+                if values[6] == 'METRO':
+                    stop_code = stop_code + values[7]
                     metro_stations.add(stop_code)
 
                 output[stop_code]['info']['stop_name'] = stop_name
