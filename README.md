@@ -80,7 +80,7 @@ EARLY_TRANSACTION_BUCKET_NAME='PUT_HERE_YOUR_TRANSACTION_BUCKET_NAME'
 MAPBOX_KEY='PUT_HERE_YOUR_MAPBOX_KEY'
 ```
 
-PUT_HERE_YOUR_ACCESS_KEY y PUT_HERE_YOUR_SECRET_ACCESS_KEY can be obtained by an AWS user credentials (https://console.aws.amazon.com/iam/home?#/users).
+PUT_HERE_YOUR_ACCESS_KEY and PUT_HERE_YOUR_SECRET_ACCESS_KEY can be obtained by an AWS user credentials (https://console.aws.amazon.com/iam/home?#/users).
 
 EARLY_TRANSACTION_BUCKET_NAME is the name for aws bucket.
 
