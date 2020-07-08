@@ -89,8 +89,6 @@ def get_output_dict(available_files):
                 output[auth_stop_code]['info']['area'] = area.title()
                 output[auth_stop_code]['dates'][date] += int(transactions)
 
-
-
     return output, metro_stations, metrotren_stations
 
 
@@ -114,7 +112,7 @@ def add_location_to_stop_data(inputs_path, output, dates_in_range):
             if 'auth_stop_code' not in dict(output)[auth_stop_code]['info']:
                 output[auth_stop_code]['info']['auth_stop_code'] = auth_stop_code
             if 'stop_name' not in dict(output)[auth_stop_code]['info']:
-                output[auth_stop_code]['info']['s'] = auth_stop_code
+                output[auth_stop_code]['info']['stop_name'] = stop_name
             if output[auth_stop_code]['dates'] == {}:
                 for date in dates_in_range:
                     output[auth_stop_code]['dates'][date.strftime('%Y-%m-%d')] = 0
@@ -132,7 +130,8 @@ def add_location_to_metro_station_data(inputs_path, output, metro_stations, date
             output[station_name + line]['info']['longitude'] = float(metro_station[2])
             output[station_name + line]['info']['latitude'] = float(metro_station[3])
             output[station_name + line]['info']['user_stop_code'] = "Estación {0}".format(station_name.title())
-            output[station_name + line]['info']['auth_stop_code'] = "Estación {0} {1}".format(station_name.title(), line)
+            output[station_name + line]['info']['auth_stop_code'] = "Estación {0} {1}".format(station_name.title(),
+                                                                                              line)
             output[station_name + line]['info']['stop_name'] = "Estación {0} {1}".format(station_name.title(), line)
 
             if station_name + line not in metro_stations:
@@ -162,7 +161,7 @@ def create_csv_data(outputs_path, output_filename, output):
     with open(os.path.join(outputs_path, output_filename + '.csv'), 'w', newline='\n', encoding='latin-1') as outfile:
         csv_data = []
         w = csv.writer(outfile)
-        w.writerow(['Fecha', 'Código de usuario', 'Código ts', 'Comuna', 'Latitud', 'Longitud', 'Subidas'])
+        w.writerow(['Fecha', 'Nombre', 'Código de usuario', 'Código ts', 'Comuna', 'Latitud', 'Longitud', 'Subidas'])
         for data in dict(output):
             info = dict(output)[data]['info']
             longitude = '-'
@@ -200,14 +199,14 @@ def create_csv_data(outputs_path, output_filename, output):
                 valid = False
 
             if 'stop_name' in dict(output)[data]['info']:
-                auth_stop_code = info['stop_name']
+                stop_name = info['stop_name']
             else:
                 logger.warning("Warning: %s doesn't have stop name" % data)
                 valid = False
 
             for date in dict(output)[data]['dates']:
                 if valid:
-                    data_row = [date + " 00:00:00", user_stop_code, auth_stop_code, area, longitude, latitude,
+                    data_row = [date + " 00:00:00", stop_name, user_stop_code, auth_stop_code, area, longitude, latitude,
                                 dict(output)[data]['dates'][date]]
                     w.writerow(data_row)
                     csv_data.append(data_row)
