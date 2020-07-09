@@ -5,7 +5,7 @@ from datetime import datetime
 from unittest import TestCase
 
 import mock
-
+import logging
 import process_data
 
 
@@ -16,6 +16,8 @@ class ProcessDataTest(TestCase):
         self.data_path = os.path.join(dir_path, 'files')
         self.test_html_path = os.path.join(self.data_path, '2020-05-09.4daytransactionbystop.html')
         self.test_csv_path = os.path.join(self.data_path, '2020-05-09.4daytransactionbystop.csv')
+        logging.disable(logging.CRITICAL)
+
 
     @mock.patch('process_data.AWSSession')
     def test_check_available_days(self, aws_session):
@@ -43,8 +45,9 @@ class ProcessDataTest(TestCase):
     def test_get_output_dict(self):
         available_files = [os.path.join(self.data_path, '2020-05-09.4daytransactionbystop.gz')]
         expected_output = defaultdict(lambda: dict(info=dict(), dates=defaultdict(lambda: 0)))
-        expected_output['T-17-140-OP-80']['info']['stop_code'] = 'T-17-140-OP-80'
-        expected_output['T-17-140-OP-80']['info']['stop_name'] = 'PC1106'
+        expected_output['T-17-140-OP-80']['info']['auth_stop_code'] = 'T-17-140-OP-80'
+        expected_output['T-17-140-OP-80']['info']['user_stop_code'] = 'PC1106'
+        expected_output['T-17-140-OP-80']['info']['stop_name'] = 'Parada / Municipalidad de Las Condes'
         expected_output['T-17-140-OP-80']['info']['area'] = 'Las Condes'
         expected_output['T-17-140-OP-80']['dates']['2020-05-09'] = 3
         self.assertDictEqual(expected_output['T-17-140-OP-80'],
@@ -53,7 +56,7 @@ class ProcessDataTest(TestCase):
     def test_add_location_to_stop_data(self):
         dates_in_range = [datetime.strptime('2020-05-09', "%Y-%m-%d")]
         expected_output = defaultdict(lambda: dict(info=dict(), dates=defaultdict(lambda: 0)))
-        expected_output['T-17-140-OP-80']['info']['stop_code'] = 'T-17-140-OP-80'
+        expected_output['T-17-140-OP-80']['info']['auth_stop_code'] = 'T-17-140-OP-80'
         expected_output['T-17-140-OP-80']['info']['area'] = 'LAS CONDES'
         expected_output['T-17-140-OP-80']['dates']['2020-05-08'] = 3
         output = process_data.add_location_to_stop_data(self.data_path, expected_output, dates_in_range)
@@ -64,7 +67,7 @@ class ProcessDataTest(TestCase):
     def test_add_location_to_metro_station_data(self):
         dates_in_range = [datetime.strptime('2020-05-30', "%Y-%m-%d")]
         expected_output = defaultdict(lambda: dict(info=dict(), dates=defaultdict(lambda: 0)))
-        expected_output['TOBALABAL4']['info']['stop_code'] = 'Estación Tobalaba'
+        expected_output['TOBALABAL4']['info']['auth_stop_code'] = 'Estación Tobalaba'
         expected_output['TOBALABAL4']['info']['area'] = 'Estación Tobalaba L4'
         expected_output['TOBALABAL4']['dates']['2020-05-30'] = 0
         output = process_data.add_location_to_metro_station_data(self.data_path, expected_output, ('TOBALABAL4'),
@@ -76,7 +79,7 @@ class ProcessDataTest(TestCase):
     def test_add_location_to_metrotren_station_data(self):
         dates_in_range = [datetime.strptime('2020-05-30', "%Y-%m-%d")]
         expected_output = defaultdict(lambda: dict(info=dict(), dates=defaultdict(lambda: 0)))
-        expected_output['Estacion Nos']['info']['stop_code'] = 'Estacion Nos'
+        expected_output['Estacion Nos']['info']['auth_stop_code'] = 'Estacion Nos'
         expected_output['Estacion Nos']['info']['area'] = 'Estacion Nos'
         expected_output['Estacion Nos']['dates']['2020-05-30'] = 0
         output = process_data.add_location_to_metrotren_station_data(self.data_path, expected_output,
@@ -88,16 +91,18 @@ class ProcessDataTest(TestCase):
     def test_create_csv_data(self):
         output_filename = '2020-05-09.4daytransactionbystop'
         expected_output = defaultdict(lambda: dict(info=dict(), dates=defaultdict(lambda: 0)))
-        expected_output['T-17-140-OP-80']['info']['stop_code'] = 'T-17-140-OP-80'
-        expected_output['T-17-140-OP-80']['info']['stop_name'] = 'PC1106'
+        expected_output['T-17-140-OP-80']['info']['auth_stop_code'] = 'T-17-140-OP-80'
+        expected_output['T-17-140-OP-80']['info']['user_stop_code'] = 'PC1106'
+        expected_output['T-17-140-OP-80']['info']['stop_name'] = 'Parada / Municipalidad de Las Condes'
         expected_output['T-17-140-OP-80']['info']['area'] = 'Las Condes'
         expected_output['T-17-140-OP-80']['dates']['2020-05-08'] = 3
         expected_output['T-17-140-OP-80']['info']['longitude'] = -33.41611369
         expected_output['T-17-140-OP-80']['info']['latitude'] = -70.59369329
         expected_output['ERROR']['info']['stop'] = 'Prueba con erroresss'
-        excpected_csv = [
-            ['2020-05-08 00:00:00', 'PC1106', 'T-17-140-OP-80', 'Las Condes', -33.41611369, -70.59369329, 3]]
-        self.assertEqual(excpected_csv, process_data.create_csv_data(self.data_path, output_filename, expected_output))
+        expected_csv = [
+            ['2020-05-08 00:00:00', 'Parada / Municipalidad de Las Condes', 'PC1106', 'T-17-140-OP-80', 'Las Condes',
+             -33.41611369, -70.59369329, 3]]
+        self.assertEqual(expected_csv, process_data.create_csv_data(self.data_path, output_filename, expected_output))
 
     def test_write_info_to_kepler_file(self):
         csv_data = [['2020-05-08 00:00:00', 'PC1106', 'LAS CONDES', -33.41611369, -70.59369329, 3]]

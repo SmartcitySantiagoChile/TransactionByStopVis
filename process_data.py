@@ -61,28 +61,33 @@ def get_output_dict(available_files):
             file_obj.readline()
             for line in file_obj.readlines():
                 values = line.split(';')
-                stop_code = values[2].encode('latin-1').decode('utf-8')
+                auth_stop_code = values[2].encode('latin-1').decode('utf-8')
 
-                if stop_code == "-":
+                if auth_stop_code == "-":
                     continue
 
-                stop_name = values[3]
+                user_stop_code = values[3]
 
+                if user_stop_code == "-":
+                    user_stop_code = auth_stop_code
+
+                stop_name = values[5]
                 if stop_name == "-":
-                    stop_name = stop_code
+                    stop_name = auth_stop_code
 
                 area = values[4]
                 date = values[0]
                 transactions = values[10]
 
                 if values[6] == 'METRO':
-                    stop_code = stop_code + values[7]
-                    metro_stations.add(stop_code)
+                    auth_stop_code = auth_stop_code + values[7]
+                    metro_stations.add(auth_stop_code)
 
-                output[stop_code]['info']['stop_name'] = stop_name
-                output[stop_code]['info']['stop_code'] = stop_code
-                output[stop_code]['info']['area'] = area.title()
-                output[stop_code]['dates'][date] += int(transactions)
+                output[auth_stop_code]['info']['stop_name'] = stop_name
+                output[auth_stop_code]['info']['user_stop_code'] = user_stop_code
+                output[auth_stop_code]['info']['auth_stop_code'] = auth_stop_code
+                output[auth_stop_code]['info']['area'] = area.title()
+                output[auth_stop_code]['dates'][date] += int(transactions)
 
     return output, metro_stations, metrotren_stations
 
@@ -92,21 +97,25 @@ def add_location_to_stop_data(inputs_path, output, dates_in_range):
         spamreader = csv.reader(csv_file_obj, delimiter='|')
         next(spamreader)
         for row in spamreader:
-            stop_code = row[4]
+            auth_stop_code = row[4]
+            user_stop_code = row[5]
+            stop_name = row[6]
             stop_longitude = row[7]
             stop_latitude = row[8]
 
-            output[stop_code]['info']['longitude'] = float(stop_longitude)
-            output[stop_code]['info']['latitude'] = float(stop_latitude)
-            if 'area' not in dict(output)[stop_code]['info']:
-                output[stop_code]['info']['area'] = '-'
-            if 'stop_name' not in dict(output)[stop_code]['info']:
-                output[stop_code]['info']['stop_name'] = row[5]
-            if 'stop_code' not in dict(output)[stop_code]['info']:
-                output[stop_code]['info']['stop_code'] = stop_code
-            if output[stop_code]['dates'] == {}:
+            output[auth_stop_code]['info']['longitude'] = float(stop_longitude)
+            output[auth_stop_code]['info']['latitude'] = float(stop_latitude)
+            if 'area' not in dict(output)[auth_stop_code]['info']:
+                output[auth_stop_code]['info']['area'] = '-'
+            if 'user_stop_code' not in dict(output)[auth_stop_code]['info']:
+                output[auth_stop_code]['info']['user_stop_code'] = user_stop_code
+            if 'auth_stop_code' not in dict(output)[auth_stop_code]['info']:
+                output[auth_stop_code]['info']['auth_stop_code'] = auth_stop_code
+            if 'stop_name' not in dict(output)[auth_stop_code]['info']:
+                output[auth_stop_code]['info']['stop_name'] = stop_name
+            if output[auth_stop_code]['dates'] == {}:
                 for date in dates_in_range:
-                    output[stop_code]['dates'][date.strftime('%Y-%m-%d')] = 0
+                    output[auth_stop_code]['dates'][date.strftime('%Y-%m-%d')] = 0
 
         return output
 
@@ -120,8 +129,11 @@ def add_location_to_metro_station_data(inputs_path, output, metro_stations, date
             line = metro_station[4]
             output[station_name + line]['info']['longitude'] = float(metro_station[2])
             output[station_name + line]['info']['latitude'] = float(metro_station[3])
-            output[station_name + line]['info']['stop_name'] = "Estación {0}".format(station_name.title())
-            output[station_name + line]['info']['stop_code'] = "Estación {0} {1}".format(station_name.title(), line)
+            output[station_name + line]['info']['user_stop_code'] = "Estación {0}".format(station_name.title())
+            output[station_name + line]['info']['auth_stop_code'] = "Estación {0} {1}".format(station_name.title(),
+                                                                                              line)
+            output[station_name + line]['info']['stop_name'] = "Estación {0} {1}".format(station_name.title(), line)
+
             if station_name + line not in metro_stations:
                 output[station_name + line]['info']['area'] = metro_station[1].title()
                 for date in dates_in_range:
@@ -133,13 +145,15 @@ def add_location_to_metrotren_station_data(inputs_path, output, dates_in_range):
     with open(os.path.join(inputs_path, 'metrotren.geojson')) as metro:
         data = json.load(metro)
         for metrotren in data['features']:
-            metro_station = metrotren['properties']['name']
-            metro_latitude = metrotren['geometry']['coordinates'][0]
-            metro_longitude = metrotren['geometry']['coordinates'][1]
-            output[metro_station]['info']['longitude'] = float(metro_longitude)
-            output[metro_station]['info']['latitude'] = float(metro_latitude)
-            if not 'stop_name' in dict(output)[metro_station]['info']:
-                output[metro_station]['info']['stop_name'] = metro_station
+            metrotren_station = metrotren['properties']['name']
+            metrotren_latitude = metrotren['geometry']['coordinates'][0]
+            metrotren_longitude = metrotren['geometry']['coordinates'][1]
+            output[metrotren_station]['info']['longitude'] = float(metrotren_longitude)
+            output[metrotren_station]['info']['latitude'] = float(metrotren_latitude)
+            if not 'user_stop_code' in dict(output)[metrotren_station]['info']:
+                output[metrotren_station]['info']['user_stop_code'] = metrotren_station
+            if not 'stop_name' in dict(output)[metrotren_station]['info']:
+                output[metrotren_station]['info']['stop_name'] = metrotren_station
     return output
 
 
@@ -147,7 +161,7 @@ def create_csv_data(outputs_path, output_filename, output):
     with open(os.path.join(outputs_path, output_filename + '.csv'), 'w', newline='\n', encoding='latin-1') as outfile:
         csv_data = []
         w = csv.writer(outfile)
-        w.writerow(['Fecha', 'Código de usuario', 'Código ts', 'Comuna', 'Latitud', 'Longitud', 'Subidas'])
+        w.writerow(['Fecha', 'Nombre', 'Código de usuario', 'Código ts', 'Comuna', 'Latitud', 'Longitud', 'Subidas'])
         for data in dict(output):
             info = dict(output)[data]['info']
             longitude = '-'
@@ -172,21 +186,27 @@ def create_csv_data(outputs_path, output_filename, output):
                 logger.warning("%s doesn't have area" % data)
                 valid = False
 
-            if 'stop_name' in dict(output)[data]['info']:
-                stop_name = info['stop_name']
+            if 'user_stop_code' in dict(output)[data]['info']:
+                user_stop_code = info['user_stop_code']
             else:
-                logger.warning("%s doesn't have stop name" % data)
+                logger.warning("%s doesn't have user stop code" % data)
                 valid = False
 
-            if 'stop_code' in dict(output)[data]['info']:
-                stop_code = info['stop_code']
+            if 'auth_stop_code' in dict(output)[data]['info']:
+                auth_stop_code = info['auth_stop_code']
+            else:
+                logger.warning("Warning: %s doesn't have auth stop code" % data)
+                valid = False
+
+            if 'stop_name' in dict(output)[data]['info']:
+                stop_name = info['stop_name']
             else:
                 logger.warning("Warning: %s doesn't have stop name" % data)
                 valid = False
 
             for date in dict(output)[data]['dates']:
                 if valid:
-                    data_row = [date + " 00:00:00", stop_name, stop_code, area, longitude, latitude,
+                    data_row = [date + " 00:00:00", stop_name, user_stop_code, auth_stop_code, area, longitude, latitude,
                                 dict(output)[data]['dates'][date]]
                     w.writerow(data_row)
                     csv_data.append(data_row)
