@@ -45,6 +45,7 @@ def get_available_files(dates_in_range, aws_session, data_path):
             logger.info('file {0} exists in local storage ... skip'.format(filename))
             available_files.append(file_path)
         else:
+            logger.info('downloading file {0}...'.format(filename))
             aws_session.download_object_from_bucket(filename, file_path)
             available_files.append(file_path)
     return available_files
